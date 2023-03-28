@@ -217,6 +217,91 @@ public class BookController {
 
 
 
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
+    }
+
+    @PutMapping("/{id}")
+    public void updateUser(@PathVariable Long id, @RequestBody User user) {
+        userService.updateUser(id, user);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+    }
+}
+
+
+
+@Service
+public class UserService {
+
+    private final String API_URL = "https://example.com/api/users";
+    private final RestTemplate restTemplate;
+
+    public UserService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public List<User> getAllUsers() {
+        ResponseEntity<User[]> response = restTemplate.getForEntity(API_URL, User[].class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public User getUserById(Long id) {
+        ResponseEntity<User> response = restTemplate.getForEntity(API_URL + "/" + id, User.class);
+        return response.getBody();
+    }
+
+    public User createUser(User user) {
+        ResponseEntity<User> response = restTemplate.postForEntity(API_URL, user, User.class);
+        return response.getBody();
+    }
+
+    public void updateUser(Long id, User user) {
+        restTemplate.put(API_URL + "/" + id, user);
+    }
+
+    public void deleteUser(Long id) {
+        restTemplate.delete(API_URL + "/" + id);
+    }
+}
+
+
+
+public class User {
+    private Long id;
+    private String name;
+    private String email;
+
+    // getters and setters
+}
+
+
+
+
 
 
    
